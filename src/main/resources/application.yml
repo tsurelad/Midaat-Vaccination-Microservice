@@ -1,0 +1,67 @@
+---
+management:
+  security:
+    role:                   ADMIN
+    enabled:                true
+
+  port:                     8081
+
+server:
+  port:                     8080
+
+spring:
+  datasource:
+    initialize:             true
+
+  jackson:
+    serialization:
+      INDENT_OUTPUT:        true
+
+#http:
+#  mappers:
+#    jsonPrettyPrint:        true
+
+---
+spring:
+  profiles:                 test
+
+  jpa:
+    hibernate:
+      ddl-auto:             create-drop
+    generate-ddl:           true
+    show-sql:               true
+
+---
+spring:
+  profiles:                 postgres
+
+  jpa:
+    hibernate:
+      ddl-auto:             update
+    database-platform:      org.hibernate.dialect.PostgreSQLDialect
+    generate-ddl:           true
+    show-sql:               true
+
+  datasource:
+    driverClassName:        org.postgresql.Driver
+    url:                    jdbc:postgresql://localhost:5432/my_db
+    username:               postgres
+    password:               postgres
+
+
+---
+spring:
+  profiles:                 mysql
+
+  jpa:
+    hibernate:
+      ddl-auto:             update
+    database-platform:      org.hibernate.dialect.MySQLDialect
+    generate-ddl:           true
+    show-sql:               true
+
+  datasource:
+    driverClassName:        com.mysql.jdbc.Driver
+    url:                    jdbc:mysql://localhost:3306/my_db
+    username:               testuser
+    password:               testpassword
