@@ -9,6 +9,7 @@
             passwordValue = $(".password").val();
             link = serverValue + path;
             $.ajax({
+                beforeSend: function(xhr) { xhr.setRequestHeader("Authorization", "Basic " + btoa(usernameValue + ":" + passwordValue)); },
                 url: link,
                 type: "GET",
                 dataType: "json",
