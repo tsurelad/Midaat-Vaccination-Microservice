@@ -32,4 +32,17 @@ public class Compound implements IdObject {
     @OneToMany(mappedBy = "compound")
     @JsonIgnore
     List<CompoundInVaccinationDate> vaccinationDates;
+
+    @Override
+    public String toString() {
+        return "Compound{" +
+                "id='" + id + '\'' +
+                ", name='" + name + '\'' +
+                ", compoundMethod='" + compoundMethod + '\'' +
+                ", description='" + description + '\'' +
+                ", furtherInformation='" + furtherInformation + '\'' +
+                ", color='" + color + '\'' +
+                ", externalLink=" + externalLink +
+                '}';
+    }
 }

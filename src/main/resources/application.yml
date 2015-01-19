@@ -4,10 +4,11 @@ management:
     role:                   ADMIN
     enabled:                true
 
-  port:                     8081
-
 server:
   port:                     8080
+
+secure:
+    port:                   8443
 
 spring:
   datasource:
