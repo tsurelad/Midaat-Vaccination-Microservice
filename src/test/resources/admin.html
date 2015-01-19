@@ -3,49 +3,33 @@
     <title>Admin page for Vaccination Table Microservice</title>
     <script type="text/javascript" src="http://code.jquery.com/jquery-2.1.3.min.js"></script>
     <script>
-        function getLink(path, func) {
+        function getLink(path) {
             serverValue = $(".serverURL").val();
+            usernameValue = $(".username").val();
+            passwordValue = $(".password").val();
             link = serverValue + path;
             $.ajax({
                 url: link,
                 type: "GET",
-                dataType: "jsonp",
+                dataType: "json",
+                password: passwordValue,
+                username: usernameValue,
                 contentType: "application/json"
-                }).done(func);
+                }).done(function( data ) {
+                    if ( console && console.log ) {
+                      console.log( "Sample of data:", data );
+                    }
+                });
         }
-
-        function postLink(path, dataValue, func) {
-            serverValue = $(".serverURL").val();
-            link = serverValue + path;
-            $.ajax({
-                url: link,
-                type: "POST",
-                data: dataValue,
-                dataType: "jsonp",
-                contentType: "application/json"
-                }).done(func);
-        }
-
 
         $(document).ready(function(){
             $( "#vaccinationsRefresh" ).click(function() {
-                getLink("/vaccinations", function(data){
-
-                });
-            });
-
-
-            $( "#createNewVaccination" ).click(function() {
-                data = {};
-                data.name = $(".newVaccinationName").val();
-                postLink("/vaccinations", data, function(data){
-
-                });
+              getLink("/vaccinations");
             });
         });
     </script>
     <style>
-        .serverURL{
+        .serverURL,.username,.password{
         width: 300px;
         }
     </style>
@@ -54,15 +38,13 @@
 <div id="userdetails">
     <dl>
         <dt>Server:</dt><dd><input type="text" class="serverURL" name="server" value="https://vaccination.herokuapp.com"></dd>
+        <dt>Username:</dt><dd><input type="text" class="username" name="username" alt="username"/></dd>
+        <dt>Password:</dt><dd><input type="password" class="password" name="password"></dd>
     </dl>
 </div>
 <div id="vaccinations">
     <h1>Vaccinations</h1>
     <button id="vaccinationsRefresh" name="vaccinationsRefresh" type="button">Refresh</button>
-    <div class="createNewVaccination">
-        <input type="text" value="Enter vaccination name here" class="newVaccinationName"/>
-        <button type="button" id="createNewVaccination">Create new Vaccination</button>
-    </div>
 </div>
 </body>
 </html>
