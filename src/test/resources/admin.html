@@ -3,7 +3,7 @@
     <title>Admin page for Vaccination Table Microservice</title>
     <script type="text/javascript" src="http://code.jquery.com/jquery-2.1.3.min.js"></script>
     <script>
-        function getLink(path) {
+        function getLink(path, func) {
             serverValue = $(".serverURL").val();
             usernameValue = $(".username").val();
             passwordValue = $(".password").val();
@@ -15,16 +15,14 @@
                 password: passwordValue,
                 username: usernameValue,
                 contentType: "application/json"
-                }).done(function( data ) {
-                    if ( console && console.log ) {
-                      console.log( "Sample of data:", data );
-                    }
-                });
+                }).done(func);
         }
 
         $(document).ready(function(){
             $( "#vaccinationsRefresh" ).click(function() {
-              getLink("/vaccinations");
+              getLink("/vaccinations",function(data) {
+
+              });
             });
         });
     </script>
