@@ -9,7 +9,6 @@ import org.springframework.context.annotation.Configuration;
 @ComponentScan
 @EnableAutoConfiguration
 public class VaccinationTableMicroserviceApplication {
-
     public static void main(String[] args) {
         SpringApplication.run(VaccinationTableMicroserviceApplication.class, args);
     }
