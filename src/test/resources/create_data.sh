@@ -1,19 +1,19 @@
 #!/bin/bash
 
 curlMicroservice() {
-    URL=$1
+    URL=$(echo "$1" | sed 's/ /%20/g')
     DATA=$2
     curl -u admin:admin -H 'content-type: application/json' -X POST -d "$DATA" "http://localhost:8080$URL"
 }
 
 getCreatedId() {
-    grep '"id"' | head -1 | sed 's/^.*"id".*\:.*"\(.*\)".*$/\1/'
+    grep '"id"' | head -1 | sed 's/^.*"id".*\:.*\([0-9]*\).*$/\1/'
 }
 
 addVaccinationDate() {
     NAME=$1
     DESCRIPTION=$2
-    curlMicroservice "/vaccinationdates" "{\"name\":\"$NAME\",\"description\":\"$DESCRIPTION\"}"
+    curlMicroservice "/vaccinationDates" "{\"name\":\"$NAME\",\"description\":\"$DESCRIPTION\"}"
 }
 
 addVaccination() {
@@ -29,17 +29,17 @@ addCompound() {
 }
 
 addCompoundInVaccinationDate() {
-    COMPOUND_ID=$1
-    VACCINATION_DATE_ID=$2
+    COMPOUND_NAME=$1
+    VACCINATION_DATE_NAME=$2
     DESCRIPTION=$3
-    curlMicroservice "/compoundinvaccinationdates" "{\"compound\":{\"id\":\"$COMPOUND_ID\"},\"vaccinationDate\":{\"id\":\"$VACCINATION_DATE_ID\"},\"description\":\"$DESCRIPTION\"}"
+    curlMicroservice "/compoundInVaccinationDates/create?compoundName=$COMPOUND_NAME&vaccinationDateName=$VACCINATION_DATE_NAME&description=$DESCRIPTION" ""
 }
 
 addVaccinationInCompound() {
-    COMPOUND_ID=$2
-    VACCINATION_ID=$1
+    COMPOUND_NAME=$2
+    VACCINATION_NAME=$1
     DESCRIPTION=$3
-    curlMicroservice "/vaccinationincompounds" "{\"compound\":{\"id\":\"$COMPOUND_ID\"},\"vaccination\":{\"id\":\"$VACCINATION_ID\"},\"description\":\"$DESCRIPTION\"}"
+    curlMicroservice "/vaccinationInCompounds/create?compoundName=$COMPOUND_NAME&vaccinationName=$VACCINATION_NAME&description=$DESCRIPTION" ""
 }
 
 VD_1=$(addVaccinationDate "1 month" "" | getCreatedId)
@@ -57,18 +57,18 @@ C_THEBEST1=$(addCompound "The best 1" "" | getCreatedId)
 C_COMPOUND2=$(addCompound "compound 2" "" | getCreatedId)
 C_THEEND3=$(addCompound "this is the end 3" "" | getCreatedId)
 
-CIVD_1=$(addCompoundInVaccinationDate "$C_THEBEST1" "$VD_1" "" | getCreatedId)
-CIVD_2=$(addCompoundInVaccinationDate "$C_THEBEST1" "$VD_6" "" | getCreatedId)
-CIVD_3=$(addCompoundInVaccinationDate "$C_THEBEST1" "$VD_12" "" | getCreatedId)
-CIVD_4=$(addCompoundInVaccinationDate "$C_COMPOUND2" "$VD_2" "" | getCreatedId)
-CIVD_5=$(addCompoundInVaccinationDate "$C_COMPOUND2" "$VD_4" "" | getCreatedId)
-CIVD_6=$(addCompoundInVaccinationDate "$C_THEEND3" "$VD_12" "" | getCreatedId)
+CIVD_1=$(addCompoundInVaccinationDate "The best 1" "1 month" "" | getCreatedId)
+CIVD_2=$(addCompoundInVaccinationDate "The best 1" "6 months" "" | getCreatedId)
+CIVD_3=$(addCompoundInVaccinationDate "The best 1" "12 months" "" | getCreatedId)
+CIVD_4=$(addCompoundInVaccinationDate "compound 2" "2 months" "" | getCreatedId)
+CIVD_5=$(addCompoundInVaccinationDate "compound 2" "4 months" "" | getCreatedId)
+CIVD_6=$(addCompoundInVaccinationDate "this is the end 3" "12 months" "" | getCreatedId)
 
-VIC_1=$(addVaccinationInCompound "$V_LIVERB" "$C_THEBEST1" "" | getCreatedId)
-VIC_2=$(addVaccinationInCompound "$V_LIVERB" "$C_COMPOUND2" "" | getCreatedId)
-VIC_3=$(addVaccinationInCompound "$V_PLATSET" "$C_COMPOUND2" "" | getCreatedId)
-VIC_4=$(addVaccinationInCompound "$V_LIVERA" "$C_THEBEST1" "" | getCreatedId)
-VIC_5=$(addVaccinationInCompound "$V_PAPILOMA" "$C_THEBEST1" "" | getCreatedId)
-VIC_6=$(addVaccinationInCompound "$V_PAPILOMA" "$C_THEEND3" "" | getCreatedId)
+VIC_1=$(addVaccinationInCompound "Liver B" "The best 1" "" | getCreatedId)
+VIC_2=$(addVaccinationInCompound "Liver B" "compound 2" "" | getCreatedId)
+VIC_3=$(addVaccinationInCompound "Platset" "compound 2" "" | getCreatedId)
+VIC_4=$(addVaccinationInCompound "Liver A" "The best 1" "" | getCreatedId)
+VIC_5=$(addVaccinationInCompound "Papiloma" "The best 1" "" | getCreatedId)
+VIC_6=$(addVaccinationInCompound "Papiloma" "this is the end 3" "" | getCreatedId)
 
 

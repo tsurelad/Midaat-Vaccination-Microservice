@@ -3,9 +3,7 @@ package vaccination.models;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
+import javax.persistence.*;
 import java.util.List;
 
 /**
@@ -15,7 +13,8 @@ import java.util.List;
 @Data
 public class VaccinationDate implements IdObject {
     @Id
-    String id;
+    @GeneratedValue(strategy= GenerationType.AUTO)
+    Long id;
 
     String name;
     String description;

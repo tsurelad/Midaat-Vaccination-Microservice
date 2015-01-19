@@ -1,57 +1,49 @@
 package vaccination.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PagedResourcesAssembler;
-import org.springframework.hateoas.PagedResources;
-import org.springframework.hateoas.Resource;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.access.annotation.Secured;
-import org.springframework.web.bind.annotation.*;
-import vaccination.models.IDManagement;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import vaccination.models.Compound;
+import vaccination.models.Vaccination;
 import vaccination.models.VaccinationInCompound;
+import vaccination.services.CompoundService;
 import vaccination.services.VaccinationInCompoundService;
+import vaccination.services.VaccinationService;
 
 /**
- * Vaccination Controller
+ * Users management
  */
 @RestController
-@RequestMapping("/vaccinationincompounds")
+@RequestMapping("/vaccinationInCompounds")
 @SuppressWarnings("unchecked")
 public class VaccinationInCompoundController {
+
     @Autowired
     VaccinationInCompoundService vaccinationInCompoundService;
 
     @Autowired
-    VaccinationInCompoundResourceAssembler vaccinationInCompoundResourceAssembler;
+    VaccinationService vaccinationService;
 
-    @RequestMapping(value = "", method = RequestMethod.GET)
-    @Secured("ROLE_USER")
-    public PagedResources<VaccinationInCompound> showVaccinationInCompounds(Pageable pageable, PagedResourcesAssembler assembler) {
-        Page<VaccinationInCompound> vaccinationInCompounds = vaccinationInCompoundService.findAll(pageable);
-        return assembler.toResource(vaccinationInCompounds, vaccinationInCompoundResourceAssembler);
-    }
+    @Autowired
+    CompoundService compoundService;
 
-    @RequestMapping(value = "/{vaccinationInCompoundId}", method = RequestMethod.GET)
-    @Secured({"ROLE_USER"})
-    public Resource<VaccinationInCompound> showVaccinationInCompound(@PathVariable("vaccinationInCompoundId") String vaccinationInCompoundId) {
-        VaccinationInCompound vaccinationInCompound = vaccinationInCompoundService.findOne(vaccinationInCompoundId);
-        return vaccinationInCompoundResourceAssembler.toResource(vaccinationInCompound);
-    }
-
-    @RequestMapping(value = "", method = RequestMethod.POST)
-    @Secured("ROLE_ADMIN")
-    public Resource<VaccinationInCompound> newVaccinationInCompound(@RequestBody VaccinationInCompound vaccinationInCompound) {
-        vaccinationInCompound.setId(IDManagement.generateId());
-        vaccinationInCompound = vaccinationInCompoundService.save(vaccinationInCompound);
-        return vaccinationInCompoundResourceAssembler.toResource(vaccinationInCompound);
-    }
-
-    @RequestMapping(value = "/{vaccinationInCompoundId}", method = RequestMethod.PUT)
-    @Secured("ROLE_ADMIN")
-    public Resource<VaccinationInCompound> updateVaccinationInCompound(@PathVariable("vaccinationInCompoundId") String vaccinationInCompoundId, @RequestBody VaccinationInCompound vaccinationInCompound) {
-        vaccinationInCompound.setId(vaccinationInCompoundId);
-        vaccinationInCompound = vaccinationInCompoundService.save(vaccinationInCompound);
-        return vaccinationInCompoundResourceAssembler.toResource(vaccinationInCompound);
+    @RequestMapping(value = "/create", method = RequestMethod.POST)
+    @Secured({"ROLE_ADMIN"})
+    public VaccinationInCompound create(
+            @RequestParam(value = "vaccinationName", required = true) String vaccinationName,
+            @RequestParam(value = "compoundName", required = true) String compoundName,
+            @RequestParam(value = "description", required = false, defaultValue = "") String description) {
+        Sort.Order[] orders = {new Sort.Order(Sort.Direction.ASC, "name")};
+        Vaccination vaccination = vaccinationService.findAllByName(vaccinationName, new Sort(orders)).iterator().next();
+        Compound compound = compoundService.findAllByName(compoundName, new Sort(orders)).iterator().next();
+        VaccinationInCompound vaccinationInCompound = new VaccinationInCompound();
+        vaccinationInCompound.setVaccination(vaccination);
+        vaccinationInCompound.setCompound(compound);
+        vaccinationInCompound.setDescription(description);
+        return vaccinationInCompoundService.save(vaccinationInCompound);
     }
 }

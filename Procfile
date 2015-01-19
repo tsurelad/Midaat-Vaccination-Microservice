@@ -1,1 +1,1 @@
-web: java -Dserver.port=$PORT -Dsecure.port=$PORT -Ddatabase.url=$DATABASE_URL -Dspring.profiles.active=postgres -Dkeystore.file=$KEYSTORE_FILE -Dkeystore.pass=$KEYSTORE_PASS $JAVA_OPTS -jar target/vaccination-table-service-0.0.1-SNAPSHOT.jar
+web: java -Dserver.port=$PORT -Dsecure.port=$PORT -Ddatabase.url=$DATABASE_URL -Dspring.profiles.active=postgres $JAVA_OPTS -jar target/vaccination-table-service-0.0.1-SNAPSHOT.jar

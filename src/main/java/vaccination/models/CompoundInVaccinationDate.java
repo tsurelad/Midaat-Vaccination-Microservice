@@ -2,10 +2,7 @@ package vaccination.models;
 
 import lombok.Data;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
 
 /**
  * Compound in Vaccination Date
@@ -14,7 +11,8 @@ import javax.persistence.ManyToOne;
 @Data
 public class CompoundInVaccinationDate implements IdObject{
     @Id
-    String id;
+    @GeneratedValue(strategy=GenerationType.AUTO)
+    Long id;
 
     @ManyToOne
     @JoinColumn(name = "compound_id")

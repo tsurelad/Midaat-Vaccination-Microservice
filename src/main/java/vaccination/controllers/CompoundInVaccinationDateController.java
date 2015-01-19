@@ -1,57 +1,45 @@
 package vaccination.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PagedResourcesAssembler;
-import org.springframework.hateoas.PagedResources;
-import org.springframework.hateoas.Resource;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.access.annotation.Secured;
-import org.springframework.web.bind.annotation.*;
-import vaccination.models.CompoundInVaccinationDate;
-import vaccination.models.IDManagement;
-import vaccination.services.CompoundInVaccinationDateService;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import vaccination.models.*;
+import vaccination.services.*;
 
 /**
- * Vaccination Controller
+ * Users management
  */
 @RestController
-@RequestMapping("/compoundinvaccinationdates")
+@RequestMapping("/compoundInVaccinationDates")
 @SuppressWarnings("unchecked")
 public class CompoundInVaccinationDateController {
+
     @Autowired
     CompoundInVaccinationDateService compoundInVaccinationDateService;
 
     @Autowired
-    CompoundInVaccinationDateResourceAssembler compoundInVaccinationDateResourceAssembler;
+    VaccinationDateService vaccinationDateService;
 
-    @RequestMapping(value = "", method = RequestMethod.GET)
-    @Secured("ROLE_USER")
-    public PagedResources<CompoundInVaccinationDate> showCompoundInVaccinationDates(Pageable pageable, PagedResourcesAssembler assembler) {
-        Page<CompoundInVaccinationDate> compoundInVaccinationDates = compoundInVaccinationDateService.findAll(pageable);
-        return assembler.toResource(compoundInVaccinationDates, compoundInVaccinationDateResourceAssembler);
-    }
+    @Autowired
+    CompoundService compoundService;
 
-    @RequestMapping(value = "/{compoundInVaccinationDateId}", method = RequestMethod.GET)
-    @Secured({"ROLE_USER"})
-    public Resource<CompoundInVaccinationDate> showCompoundInVaccinationDate(@PathVariable("compoundInVaccinationDateId") String compoundInVaccinationDateId) {
-        CompoundInVaccinationDate compoundInVaccinationDate = compoundInVaccinationDateService.findOne(compoundInVaccinationDateId);
-        return compoundInVaccinationDateResourceAssembler.toResource(compoundInVaccinationDate);
-    }
-
-    @RequestMapping(value = "", method = RequestMethod.POST)
-    @Secured("ROLE_ADMIN")
-    public Resource<CompoundInVaccinationDate> newCompoundInVaccinationDate(@RequestBody CompoundInVaccinationDate compoundInVaccinationDate) {
-        compoundInVaccinationDate.setId(IDManagement.generateId());
-        compoundInVaccinationDate = compoundInVaccinationDateService.save(compoundInVaccinationDate);
-        return compoundInVaccinationDateResourceAssembler.toResource(compoundInVaccinationDate);
-    }
-
-    @RequestMapping(value = "/{compoundInVaccinationDateId}", method = RequestMethod.PUT)
-    @Secured("ROLE_ADMIN")
-    public Resource<CompoundInVaccinationDate> updateCompoundInVaccinationDate(@PathVariable("compoundInVaccinationDateId") String compoundInVaccinationDateId, @RequestBody CompoundInVaccinationDate compoundInVaccinationDate) {
-        compoundInVaccinationDate.setId(compoundInVaccinationDateId);
-        compoundInVaccinationDate = compoundInVaccinationDateService.save(compoundInVaccinationDate);
-        return compoundInVaccinationDateResourceAssembler.toResource(compoundInVaccinationDate);
+    @RequestMapping(value = "/create", method = RequestMethod.POST)
+    @Secured({"ROLE_ADMIN"})
+    public CompoundInVaccinationDate create(
+            @RequestParam(value = "vaccinationDateName", required = true) String vaccinationDateName,
+            @RequestParam(value = "compoundName", required = true) String compoundName,
+            @RequestParam(value = "description", required = false, defaultValue = "") String description) {
+        Sort.Order[] orders = {new Sort.Order(Sort.Direction.ASC, "name")};
+        VaccinationDate vaccinationDate = vaccinationDateService.findAllByName(vaccinationDateName, new Sort(orders)).iterator().next();
+        Compound compound = compoundService.findAllByName(compoundName, new Sort(orders)).iterator().next();
+        CompoundInVaccinationDate compoundInVaccinationDate = new CompoundInVaccinationDate();
+        compoundInVaccinationDate.setVaccinationDate(vaccinationDate);
+        compoundInVaccinationDate.setCompound(compound);
+        compoundInVaccinationDate.setDescription(description);
+        return compoundInVaccinationDateService.save(compoundInVaccinationDate);
     }
 }
