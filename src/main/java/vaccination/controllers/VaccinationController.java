@@ -42,4 +42,12 @@ public class VaccinationController {
         vaccinationService.delete(id);
         return new ResponseEntity<Vaccination>(HttpStatus.NO_CONTENT);
     }
+
+    @RequestMapping(value = "/{id}/allCompounds", method = RequestMethod.GET)
+    @Secured({"ROLE_USER"})
+    public List<VaccinationInCompound> getAllCompounds(
+            @PathVariable(value = "id") Long id) {
+        Vaccination vaccination = vaccinationService.findOne(id);
+        return vaccination.getCompounds();
+    }
 }

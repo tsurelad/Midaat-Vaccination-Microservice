@@ -8,10 +8,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-import vaccination.models.Compound;
-import vaccination.models.CompoundInVaccinationDate;
-import vaccination.models.Vaccination;
-import vaccination.models.VaccinationInCompound;
+import vaccination.models.*;
 import vaccination.services.CompoundInVaccinationDateService;
 import vaccination.services.CompoundService;
 import vaccination.services.VaccinationInCompoundService;
@@ -51,5 +48,21 @@ public class CompoundController {
         }
         compoundService.delete(id);
         return new ResponseEntity<Compound>(HttpStatus.NO_CONTENT);
+    }
+
+    @RequestMapping(value = "/{id}/allVaccinations", method = RequestMethod.GET)
+    @Secured({"ROLE_USER"})
+    public List<VaccinationInCompound> getAllVaccinations(
+            @PathVariable(value = "id") Long id) {
+        Compound compound = compoundService.findOne(id);
+        return compound.getVaccinations();
+    }
+
+    @RequestMapping(value = "/{id}/allVaccinationDates", method = RequestMethod.GET)
+    @Secured({"ROLE_USER"})
+    public List<CompoundInVaccinationDate> getAllVaccinationDates(
+            @PathVariable(value = "id") Long id) {
+        Compound compound = compoundService.findOne(id);
+        return compound.getVaccinationDates();
     }
 }

@@ -42,4 +42,12 @@ public class VaccinationDateController {
         vaccinationDateService.delete(id);
         return new ResponseEntity<VaccinationDate>(HttpStatus.NO_CONTENT);
     }
+
+    @RequestMapping(value = "/{id}/allCompounds", method = RequestMethod.GET)
+    @Secured({"ROLE_USER"})
+    public List<CompoundInVaccinationDate> getAllCompounds(
+            @PathVariable(value = "id") Long id) {
+        VaccinationDate vaccinationDate = vaccinationDateService.findOne(id);
+        return vaccinationDate.getCompounds();
+    }
 }
