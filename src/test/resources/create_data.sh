@@ -32,14 +32,14 @@ addCompoundInVaccinationDate() {
     COMPOUND_NAME=$1
     VACCINATION_DATE_NAME=$2
     DESCRIPTION=$3
-    curlMicroservice "/compoundInVaccinationDates/create?compoundName=$COMPOUND_NAME&vaccinationDateName=$VACCINATION_DATE_NAME&description=$DESCRIPTION" ""
+    curlMicroservice "/compoundInVaccinationDates/createByNames?compoundName=$COMPOUND_NAME&vaccinationDateName=$VACCINATION_DATE_NAME&description=$DESCRIPTION" ""
 }
 
 addVaccinationInCompound() {
     COMPOUND_NAME=$2
     VACCINATION_NAME=$1
     DESCRIPTION=$3
-    curlMicroservice "/vaccinationInCompounds/create?compoundName=$COMPOUND_NAME&vaccinationName=$VACCINATION_NAME&description=$DESCRIPTION" ""
+    curlMicroservice "/vaccinationInCompounds/createByNames?compoundName=$COMPOUND_NAME&vaccinationName=$VACCINATION_NAME&description=$DESCRIPTION" ""
 }
 
 VD_1=$(addVaccinationDate "1 month" "" | getCreatedId)
