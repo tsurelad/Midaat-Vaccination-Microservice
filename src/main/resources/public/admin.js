@@ -311,6 +311,7 @@
         $scope.doAuth = function () {
             $scope.credentials.fullHost = $scope.credentials.host;
             if ($scope.credentials.fullHost && !$scope.credentials.fullHost.match(/^https?:/)) $scope.credentials.fullHost = location.protocol+"//" + $scope.credentials.fullHost;
+            if (!$scope.credentials.fullHost) $scope.credentials.fullHost = "";
 
             authenticate(function() {
                 angular.forEach($scope.credentials, function(v,k) {
