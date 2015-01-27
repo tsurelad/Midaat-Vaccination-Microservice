@@ -29,6 +29,9 @@ Examples:
 
 If you want (and you do...) a better security - change the password for those users in the DB. The two relevant tables are `authorities` for managing the user roles, and `users` for managing usernames and passwords.
 
+## Admin interface
+Go to `/admin.html` (e.g. [localhost](http://localhost:8080/admin.html)) to edit the DB models. You can leave the "server" field empty, and it'll use itself as the current server. You must use an admin user.
+
 ## Deploy to Heroku
 If you want to deploy your project on heroku, just sign up [here](https://www.heroku.com/), download the [heroku toolbelt](https://toolbelt.heroku.com/), and then run:
 

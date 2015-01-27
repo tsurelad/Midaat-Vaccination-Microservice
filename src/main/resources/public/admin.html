@@ -1,0 +1,172 @@
+<!doctype html>
+<html ng-app="midaat">
+<head>
+    <title>מדעת - טבלת חיסונים</title>
+    <meta charset="UTF-8">
+
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">
+
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap-theme.min.css">
+    <style>
+        body {
+            padding-top: 80px;
+        }
+
+        h1 {
+            margin-bottom: 40px;
+        }
+        .entry {
+            padding: 5px;
+            margin-bottom: 5px;
+            border: 1px solid #333;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        .entry.active {
+            background-color: lavender;
+        }
+        .entry.editing {
+            cursor: auto;
+        }
+        .entry.associated {
+            background-color: azure;
+        }
+        .entry .entry-name {
+            font-size: 16px;
+            font-weight: bold;
+        }
+        .entry form {
+            margin-top: 10px;
+        }
+
+        label + div > label {
+            font-weight: normal;
+            margin-left: 15px;
+        }
+
+
+        .new-entry-button {
+            cursor: pointer;
+        }
+
+        .login {
+            max-width: 300px;
+            margin: auto;
+        }
+        .ltr, .login input {
+            direction: ltr;
+        }
+        .login .btn {
+            margin-top: 10px;
+        }
+    </style>
+
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.8/angular.min.js"></script>
+    <script src="admin.js"></script>
+</head>
+<body ng-controller="MainController" ng-click="toggleActive(null)" dir="rtl">
+
+<div class="container" ng-init="labels={vaccinations:'חיסונים', vaccinationDates: 'תאריכים', compounds: 'תרכובות'}">
+    <h1 class="text-center">מדעת - טבלת חיסונים</h1>
+
+    <div ng-show="credentials.auth">
+        <div class="col-md-4 object-{{object.key}}" ng-repeat="object in objects">
+            <h2>{{labels[object.key]}}</h2>
+            <div ng-show="data[object.key].length">
+                <div class="entry" ng-class="{active: entry.active, editing: entry.active == 2, associated: active && active.form && active[object.key][entry.id]}" ng-click="toggleActive(entry); $event.stopPropagation();" ng-repeat="entry in data[object.key]">
+                    <div class="entry-name">
+                        {{entry.name}}
+                    </div>
+                    <div class="entry-description" ng-show="entry.active">
+                        {{entry.description}}
+                    </div>
+                    <div ng-show="entry.active == 2">
+                        <form ng-submit="doUpdate(object, entry)" ng-init="createForm(entry)" novalidate>
+                            <ng-include src="'/template/entry.html'"></ng-include>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="new-entry-button" ng-click="toggleActive(object.form); $event.stopPropagation();">
+                <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> הוסף {{labels[object.key]}}
+            </div>
+            <div class="entry active new-entry-form" ng-show="object.form.active" ng-click="$event.stopPropagation();">
+                <form ng-submit="doCreate(object)" novalidate ng-init="entry = object">
+                    <ng-include src="'/template/entry.html'"></ng-include>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script type="text/ng-template" id="/template/entry.html">
+        <input ng-model="entry.form.id" type="hidden" required/>
+        <label>שם</label>
+        <input ng-model="entry.form.name" class="form-control" type="text" required/>
+        <label>תיאור</label>
+        <textarea ng-model="entry.form.description" class="form-control"></textarea>
+
+        <ng-include src="'/template/entry-'+object.key+'.html'"></ng-include>
+
+        <div ng-repeat="dependent in objects">
+            <div ng-if="object.dependent[dependent.key]">
+                <label>{{labels[dependent.key]}}</label>
+                <div ng-if="!data[dependent.key].length">
+                    לא נוצרו {{labels[dependent.key]}}
+                </div>
+                <div>
+                    <label ng-repeat="depentry in data[dependent.key]">
+                        <input type="checkbox" ng-model="entry.form[dependent.key][depentry.id]"> {{depentry.name}}
+                    </label>
+                </div>
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary">
+            שמור
+        </button>
+        <a class="btn btn-danger" ng-show="entry.id" ng-click="doDelete(object, entry)">
+            מחק
+        </a>
+    </script>
+    <script type="text/ng-template" id="/template/entry-vaccinations.html">
+        <label>מידע נוסף</label>
+        <textarea ng-model="entry.form.furtherInformation" class="form-control"></textarea>
+        <label>לינק</label>
+        <input ng-model="entry.form.externalLink" class="form-control ltr" type="text"/>
+    </script>
+
+    <script type="text/ng-template" id="/template/entry-compounds.html">
+        <label>צורת ההרכב</label>
+        <input ng-model="entry.form.compoundMethod" class="form-control" type="text"/>
+        <label>צבע</label>
+        <input ng-model="entry.form.color" class="form-control ltr" type="text" style="color: {{entry.form.color}}"/>
+        <label>מידע נוסף</label>
+        <textarea ng-model="entry.form.furtherInformation" class="form-control"></textarea>
+        <label>לינק</label>
+        <input ng-model="entry.form.externalLink" class="form-control ltr" type="text"/>
+    </script>
+
+    <script type="text/ng-template" id="/template/entry-vaccinationDates.html">
+    </script>
+
+    <div ng-hide="credentials.auth">
+        <form ng-submit="doAuth()" novalidate class="login">
+            <label>שרת</label>
+            <input ng-model="credentials.host" class="form-control" type="text" required/>
+            <label>שם</label>
+            <input ng-model="credentials.user" class="form-control" type="text" required/>
+            <label>סיסמא</label>
+            <input ng-model="credentials.password" class="form-control" type="password" required/>
+            <button class="btn btn-primary">התחבר</button>
+        </form>
+    </div>
+
+
+</div><!-- /.container -->
+</body>
+</html>
