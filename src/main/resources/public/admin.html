@@ -74,6 +74,8 @@
 <div class="container" ng-init="labels={vaccinations:'חיסונים', vaccinationDates: 'תאריכים', compounds: 'תרכובות'}">
     <h1 class="text-center">מדעת - טבלת חיסונים</h1>
 
+    <div style="font-size: large; text-align: center;" ng-show="credentials.auth"><a href="/backup" target="_blank">גיבוי הנתונים</a></div>
+
     <div ng-show="credentials.auth">
         <div class="col-md-4 object-{{object.key}}" ng-repeat="object in objects">
             <h2>{{labels[object.key]}}</h2>

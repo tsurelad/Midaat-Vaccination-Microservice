@@ -1,5 +1,6 @@
 ---
 management:
+  port:                     8081
   security:
     role:                   ADMIN
     enabled:                true
@@ -60,6 +61,3 @@ spring:
 
   datasource:
     driverClassName:        com.mysql.jdbc.Driver
-    url:                    jdbc:mysql://localhost:3306/my_db
-    username:               testuser
-    password:               testpassword

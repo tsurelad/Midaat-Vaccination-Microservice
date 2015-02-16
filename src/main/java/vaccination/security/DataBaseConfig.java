@@ -25,6 +25,43 @@ public abstract class DataBaseConfig {
 }
 
 @Configuration
+@Profile("mysql")
+class MySQLDatabaseConfig extends DataBaseConfig {
+
+    @Bean
+    public DataSource dataSource() {
+        org.apache.tomcat.jdbc.pool.DataSource dataSource = new org.apache.tomcat.jdbc.pool.DataSource();
+
+        String username = "username";
+        String password = "password";
+        String url = "jdbc:mysql://localhost:3306/dbname";
+
+        URI dbUri;
+        try {
+            String dbProperty = System.getProperty("database.url");
+            if(dbProperty != null) {
+                dbUri = new URI(dbProperty);
+
+                username = dbUri.getUserInfo().split(":")[0];
+                password = dbUri.getUserInfo().split(":")[1];
+                url = "jdbc:mysql://" + dbUri.getHost() + ':' + dbUri.getPort() + dbUri.getPath();
+            }
+        } catch (URISyntaxException e) {
+            //Deal with errors here.
+        }
+
+        dataSource.setUrl(url);
+        dataSource.setUsername(username);
+        dataSource.setPassword(password);
+        dataSource.setValidationQuery("SELECT 1");
+
+        configureDataSource(dataSource);
+
+        return dataSource;
+    }
+}
+
+@Configuration
 @Profile("postgres")
 class PostgresDatabaseConfig extends DataBaseConfig {
 
